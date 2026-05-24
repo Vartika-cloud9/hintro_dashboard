@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hintro Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0f0f11;
+  --bg2: #16161a;
+  --bg3: #1c1c22;
+  --bg4: #22222a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0eee8;
+  --text2: #9c9a92;
+  --text3: #5c5a55;
+  --accent: #7c6ff7;
+  --accent2: #a599fa;
+  --accent-bg: rgba(124,111,247,0.12);
+  --green: #3ecf8e;
+  --green-bg: rgba(62,207,142,0.1);
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.1);
+  --amber: #f59e0b;
+  --amber-bg: rgba(245,158,11,0.1);
+  --sidebar-w: 240px;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 10px;
+  --radius2: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+
+/* Layout */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s ease;overflow:hidden}
+#main{flex:1;overflow-y:auto;background:var(--bg)}
+#main::-webkit-scrollbar{width:4px}
+#main::-webkit-scrollbar-track{background:transparent}
+#main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Sidebar */
+.sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:#fff;flex-shrink:0}
+.logo-text{font-size:16px;font-weight:600;letter-spacing:-0.3px}
+
+.user-switcher{padding:12px 14px;border-bottom:1px solid var(--border)}
+.user-switcher label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:6px}
+.user-btns{display:flex;gap:6px}
+.user-btn{flex:1;padding:5px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-family:var(--mono);cursor:pointer;transition:all .15s}
+.user-btn:hover{border-color:var(--accent);color:var(--accent)}
+.user-btn.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent2)}
+
+.sidebar-nav{flex:1;padding:10px 10px;overflow-y:auto}
+.nav-section{margin-bottom:18px}
+.nav-section-label{font-size:10px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text3);padding:0 8px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all .15s;color:var(--text2);font-size:13px;font-weight:400;user-select:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent2)}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 5px;border-radius:20px}
+
+.sidebar-footer{padding:12px 14px;border-top:1px solid var(--border)}
+.feedback-btn{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s}
+.feedback-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+
+/* Top bar */
+.topbar{padding:18px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10;backdrop-filter:blur(10px)}
+.topbar-title{font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;cursor:pointer}
+.status-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.status-active{background:var(--green-bg);color:var(--green)}
+.status-new{background:var(--amber-bg);color:var(--amber)}
+
+/* Content */
+.content{padding:24px 28px}
+
+/* Stat cards */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 18px;transition:border-color .2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.stat-value{font-size:26px;font-weight:600;letter-spacing:-0.5px;font-family:var(--mono)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-top:4px}
+.stat-delta.pos{color:var(--green)}
+.stat-delta.neg{color:var(--red)}
+
+/* Progress bar */
+.progress-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .6s ease}
+
+/* Usage section */
+.usage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.usage-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 18px}
+.usage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.usage-title{font-size:12px;color:var(--text2)}
+.usage-pct{font-size:12px;font-family:var(--mono);color:var(--text2)}
+.usage-count{font-size:22px;font-weight:600;font-family:var(--mono);letter-spacing:-0.5px;margin-bottom:2px}
+.usage-limit{font-size:11px;color:var(--text3)}
+
+/* Call history */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:15px;font-weight:600}
+.section-action{font-size:12px;color:var(--accent);cursor:pointer;padding:4px 10px;border-radius:6px;transition:background .15s}
+.section-action:hover{background:var(--accent-bg)}
+
+.call-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.call-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border)}
+.call-table td{padding:12px 12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+.call-table tr:last-child td{border-bottom:none}
+.call-table tr:hover td{background:var(--bg2);color:var(--text)}
+.call-client{font-weight:500;color:var(--text)}
+.call-duration{font-family:var(--mono);font-size:12px}
+.call-status{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;font-size:11px}
+.call-status.ended{background:var(--bg4);color:var(--text3)}
+.call-status.active{background:var(--green-bg);color:var(--green)}
+.lang-pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-family:var(--mono);background:var(--bg4);color:var(--text3);text-transform:uppercase}
+
+/* Empty state */
+.empty-state{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:48px 24px;text-align:center;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:0.4}
+.empty-title{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:12px}
+
+/* Subscription card */
+.sub-card{background:linear-gradient(135deg,#1a1730 0%,#1c1c22 100%);border:1px solid rgba(124,111,247,0.2);border-radius:var(--radius2);padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+.sub-plan{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:4px}
+.sub-name{font-size:16px;font-weight:600}
+.sub-cycle{font-size:11px;color:var(--text3);margin-top:2px}
+.sub-right{margin-left:auto;text-align:right}
+
+/* Loader */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text3);gap:10px}
+
+/* Feedback modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-backdrop.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:420px;transform:translateY(20px);transition:transform .25s ease}
+.modal-backdrop.open .modal{transform:translateY(0)}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px}
+.modal-close{float:right;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0;line-height:1}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);display:block;margin-bottom:6px}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c5a55' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.form-textarea{resize:vertical;min-height:80px}
+.btn{padding:9px 18px;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);filter:brightness(1.05)}
+.btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
+/* Stars */
+.star-rating{display:flex;gap:4px;margin-top:6px}
+.star{font-size:22px;cursor:pointer;transition:transform .1s}
+.star:hover,.star.selected{transform:scale(1.15)}
+.star.selected{filter:drop-shadow(0 0 4px rgba(245,158,11,0.5))}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--green);color:var(--green);padding:10px 16px;border-radius:8px;font-size:13px;z-index:200;transform:translateY(20px);opacity:0;transition:all .25s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Recent sessions mini */
+.last-sessions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.session-dot{display:flex;align-items:center;gap:5px;padding:3px 8px;background:var(--bg3);border-radius:5px;font-size:11px;font-family:var(--mono);color:var(--text3)}
+
+/* Responsive */
+@media(max-width:768px){
+  :root{--sidebar-w:0px}
+  #sidebar{position:fixed;z-index:50;width:240px;transform:translateX(-100%);transition:transform .25s ease}
+  #sidebar.open{transform:translateX(0);width:240px}
+  .content{padding:16px}
+  .topbar{padding:14px 16px}
+  .hamburger{display:flex!important}
+}
+.hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:20px;padding:4px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:40}
+.overlay.show{display:block}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">H</div>
+      <span class="logo-text">Hintro</span>
+    </div>
+    <div class="user-switcher">
+      <label>Switch User</label>
+      <div class="user-btns">
+        <button class="user-btn active" id="btn-u1" onclick="switchUser('u1')">u1 · new</button>
+        <button class="user-btn" id="btn-u2" onclick="switchUser('u2')">u2 · active</button>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <div class="nav-item active" onclick="setPage('dashboard')"><span class="nav-icon">⬛</span> Dashboard</div>
+        <div class="nav-item" onclick="setPage('calls')"><span class="nav-icon">📞</span> Call History</div>
+        <div class="nav-item" onclick="setPage('kb')"><span class="nav-icon">📚</span> Knowledge Base</div>
+        <div class="nav-item" onclick="setPage('vocab')"><span class="nav-icon">📝</span> Vocabulary</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Account</div>
+        <div class="nav-item" onclick="setPage('profile')"><span class="nav-icon">👤</span> Profile</div>
+        <div class="nav-item" onclick="setPage('billing')"><span class="nav-icon">💳</span> Billing</div>
+        <div class="nav-item" onclick="setPage('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="feedback-btn" onclick="openFeedback()">💬 Send Feedback</button>
+    </div>
+  </nav>
+
+  <!-- Mobile overlay -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- Main -->
+  <div id="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="topbar-title" id="page-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <span class="status-badge" id="user-status-badge">New User</span>
+        <div class="avatar" id="user-avatar">JD</div>
+      </div>
+    </div>
+    <div class="content" id="page-content">
+      <div class="loading-overlay"><div class="loader"></div> Loading data…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal-backdrop" id="feedback-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeFeedback()">✕</button>
+    <div class="modal-title">Share Your Feedback</div>
+    <div class="modal-sub">We read every submission. Thanks for helping us improve.</div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="fb-type">
+        <option value="bug">Bug Report</option>
+        <option value="feature">Feature Request</option>
+        <option value="general" selected>General Feedback</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your Experience</label>
+      <div class="star-rating" id="star-rating">
+        <span class="star" data-v="1" onclick="setStar(1)">☆</span>
+        <span class="star" data-v="2" onclick="setStar(2)">☆</span>
+        <span class="star" data-v="3" onclick="setStar(3)">☆</span>
+        <span class="star" data-v="4" onclick="setStar(4)">☆</span>
+        <span class="star" data-v="5" onclick="setStar(5)">☆</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea class="form-textarea" id="fb-message" placeholder="Tell us what you think…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email (optional)</label>
+      <input class="form-input" id="fb-email" type="email" placeholder="you@example.com"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeFeedback()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE = 'https://mock-backend-hintro.vercel.app';
+let currentUser = 'u1';
+let starVal = 0;
+let dashboardData = null;
+let statsData = null;
+let callsData = null;
+let currentPage = 'dashboard';
+
+async function api(path, userId) {
+  const res = await fetch(BASE + path, { headers: { 'x-user-id': userId || currentUser } });
+  if (!res.ok) throw new Error('API error: ' + res.status);
+  return res.json();
+}
+
+function fmtDuration(secs) {
+  if (!secs || secs === 0) return '—';
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function fmtRelDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7) return `${diff}d ago`;
+  if (diff < 30) return `${Math.floor(diff/7)}w ago`;
+  return fmtDate(iso);
+}
+
+async function loadAll() {
+  try {
+    [dashboardData, statsData, callsData] = await Promise.all([
+      api('/api/auth/dashboard'),
+      api('/api/call-sessions/stats'),
+      api('/api/call-sessions?limit=10')
+    ]);
+    renderPage();
+  } catch(e) {
+    document.getElementById('page-content').innerHTML = `<div class="loading-overlay" style="color:#ef4444">⚠️ Failed to load data. Check API connection.</div>`;
+  }
+}
+
+function switchUser(uid) {
+  currentUser = uid;
+  document.getElementById('btn-u1').classList.toggle('active', uid === 'u1');
+  document.getElementById('btn-u2').classList.toggle('active', uid === 'u2');
+  document.getElementById('page-content').innerHTML = '<div class="loading-overlay"><div class="loader"></div> Loading data…</div>';
+  loadAll();
+}
+
+function setPage(p) {
+  currentPage = p;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const titles = {dashboard:'Dashboard',calls:'Call History',kb:'Knowledge Base',vocab:'Vocabulary',profile:'Profile',billing:'Billing',settings:'Settings'};
+  document.getElementById('page-title').textContent = titles[p] || p;
+  if (p === 'dashboard') renderDashboard();
+  else if (p === 'calls') renderCallsPage();
+  else renderPlaceholder(titles[p]);
+  closeSidebar();
+}
+
+function renderPage() {
+  // update topbar
+  const user = dashboardData?.user;
+  if (user) {
+    const initials = ((user.firstName||'?')[0]+(user.lastName||'?')[0]).toUpperCase();
+    document.getElementById('user-avatar').textContent = initials;
+  }
+  const isActive = !!dashboardData?.subscription;
+  document.getElementById('user-status-badge').textContent = isActive ? 'Active' : 'New User';
+  document.getElementById('user-status-badge').className = 'status-badge ' + (isActive ? 'status-active' : 'status-new');
+
+  if (currentPage === 'dashboard') renderDashboard();
+  else if (currentPage === 'calls') renderCallsPage();
+}
+
+function renderDashboard() {
+  const d = dashboardData;
+  const s = statsData;
+  const user = d?.user;
+  const sub = d?.subscription;
+  const usage = d?.usage;
+  const isActive = !!sub;
+
+  let html = '';
+
+  // Subscription card
+  if (isActive) {
+    html += `<div class="sub-card">
+      <div>
+        <div class="sub-plan">${sub.plan} plan</div>
+        <div class="sub-name">${capitalize(sub.plan)} ${capitalize(sub.billing_cycle)}</div>
+        <div class="sub-cycle">${capitalize(sub.billing_cycle)} billing · <span style="color:var(--green)">${capitalize(sub.status)}</span></div>
+      </div>
+      <div class="sub-right">
+        <span style="font-size:11px;color:var(--text3)">Manage</span>
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="sub-card" style="background:var(--bg2);border-color:var(--border)">
+      <div>
+        <div class="sub-plan" style="color:var(--text3)">No plan</div>
+        <div class="sub-name">Free Tier</div>
+        <div class="sub-cycle">Upgrade to unlock more features</div>
+      </div>
+      <div class="sub-right">
+        <button class="btn btn-primary" style="font-size:12px;padding:6px 14px">Upgrade ↗</button>
+      </div>
+    </div>`;
+  }
+
+  // Call stats
+  html += `<div class="stats-grid">`;
+  html += statCard('Total Sessions', s?.totalSessions || 0, null, 'calls');
+  html += statCard('Avg Duration', fmtDuration(s?.averageDuration || 0), null, 'time');
+  html += statCard('AI Interactions', s?.totalAIInteractions || 0, null, 'ai');
+  html += statCard('Notes', usage?.notes || 0, null, 'notes');
+  html += `</div>`;
+
+  // Usage section
+  if (isActive) {
+    html += `<div class="section-header"><span class="section-title">Resource Usage</span></div>`;
+    html += `<div class="usage-grid">`;
+    const kb = usage?.kb_files;
+    html += usageCard('KB Files', kb?.used, kb?.limit, kb?.percentage);
+    html += simpleUsageCard('Vocab Terms', usage?.vocab_terms);
+    html += simpleUsageCard('Notes', usage?.notes);
+    html += `</div>`;
+  }
+
+  // Recent sessions
+  html += `<div class="section-header">
+    <span class="section-title">Recent Call Sessions</span>
+    <span class="section-action" onclick="setPage('calls')">View all →</span>
+  </div>`;
+
+  const calls = callsData?.callSessions || [];
+  if (calls.length === 0) {
+    html += `<div class="empty-state">
+      <div class="empty-icon">📞</div>
+      <div class="empty-title">No calls yet</div>
+      <div class="empty-sub">Start a call session to see your history here.</div>
+    </div>`;
+  } else {
+    html += `<table class="call-table">
+      <thead><tr>
+        <th>Client</th><th>Description</th><th>Duration</th><th>Date</th><th>Status</th>
+      </tr></thead><tbody>`;
+    calls.slice(0,5).forEach(c => {
+      html += `<tr>
+        <td class="call-client">${c.client || '—'}</td>
+        <td>${c.description || '—'}</td>
+        <td class="call-duration">${fmtDuration(c.total_duration_seconds)}</td>
+        <td style="font-size:12px">${fmtRelDate(c.started_at)}</td>
+        <td><span class="call-status ${c.status}">${capitalize(c.status?.replace('_',' ') || '—')}</span></td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  // Last session dates
+  if (s?.lastSession?.length > 0) {
+    html += `<div style="margin-bottom:24px">
+      <div class="section-header"><span class="section-title">Recent Activity</span></div>
+      <div class="last-sessions">`;
+    s.lastSession.forEach(dt => {
+      html += `<span class="session-dot">🕐 ${fmtRelDate(dt)}</span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  document.getElementById('page-content').innerHTML = html;
+}
+
+function renderCallsPage() {
+  const calls = callsData?.callSessions || [];
+  const pagination = callsData?.pagination;
+
+  let html = '';
+  if (calls.length === 0) {
+    html = `<div class="empty-state">
+      <div class="empty-icon">📞</div>
+      <div class="empty-title">No call sessions found</div>
+      <div class="empty-sub">Your call history will appear here once you start making calls.</div>
+    </div>`;
+  } else {
+    html = `<div style="margin-bottom:16px;font-size:12px;color:var(--text3)">${pagination?.totalCount || calls.length} sessions total</div>`;
+    html += `<table class="call-table">
+      <thead><tr>
+        <th>Client</th><th>Description</th><th>Participants</th><th>Duration</th><th>Language</th><th>Date</th><th>Status</th>
+      </tr></thead><tbody>`;
+    calls.forEach(c => {
+      const parts = c.participants?.map(p => p.name).join(', ') || '—';
+      const langs = (c.language||[]).map(l => `<span class="lang-pill">${l}</span>`).join(' ');
+      html += `<tr>
+        <td class="call-client">${c.client || '—'}</td>
+        <td>${c.description || '—'}</td>
+        <td style="font-size:12px;color:var(--text3)">${parts}</td>
+        <td class="call-duration">${fmtDuration(c.total_duration_seconds)}</td>
+        <td>${langs || '—'}</td>
+        <td style="font-size:12px">${fmtRelDate(c.started_at)}</td>
+        <td><span class="call-status ${c.status}">${capitalize(c.status?.replace('_',' ') || '—')}</span></td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  document.getElementById('page-content').innerHTML = html;
+}
+
+function renderPlaceholder(name) {
+  document.getElementById('page-content').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🚧</div>
+      <div class="empty-title">${name}</div>
+      <div class="empty-sub">This section is coming soon.</div>
+    </div>`;
+}
+
+function statCard(label, value, delta, icon) {
+  const icons = {calls:'📞',time:'⏱️',ai:'🤖',notes:'📝'};
+  return `<div class="stat-card">
+    <div class="stat-label">${icons[icon]||''} ${label}</div>
+    <div class="stat-value">${value}</div>
+  </div>`;
+}
+
+function usageCard(label, used, limit, pct) {
+  const col = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--amber)' : 'var(--accent)';
+  return `<div class="usage-card">
+    <div class="usage-header">
+      <span class="usage-title">${label}</span>
+      <span class="usage-pct">${pct}%</span>
+    </div>
+    <div class="usage-count">${used?.toLocaleString() || 0}</div>
+    <div class="usage-limit">of ${limit?.toLocaleString() || 0}</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct||0}%;background:${col}"></div></div>
+  </div>`;
+}
+
+function simpleUsageCard(label, count) {
+  return `<div class="usage-card">
+    <div class="usage-header"><span class="usage-title">${label}</span></div>
+    <div class="usage-count">${count || 0}</div>
+    <div class="usage-limit">total created</div>
+  </div>`;
+}
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+// Feedback
+function openFeedback() {
+  document.getElementById('feedback-modal').classList.add('open');
+  closeSidebar();
+}
+function closeFeedback() {
+  document.getElementById('feedback-modal').classList.remove('open');
+}
+function setStar(n) {
+  starVal = n;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.textContent = i < n ? '⭐' : '☆';
+    s.classList.toggle('selected', i < n);
+  });
+}
+function submitFeedback() {
+  const type = document.getElementById('fb-type').value;
+  const msg = document.getElementById('fb-message').value.trim();
+  const email = document.getElementById('fb-email').value.trim();
+  if (!msg) { showToast('Please enter a message', true); return; }
+  const feedback = { type, rating: starVal, message: msg, email, user: currentUser, ts: new Date().toISOString() };
+  const prev = JSON.parse(localStorage.getItem('hintro_feedback') || '[]');
+  prev.push(feedback);
+  localStorage.setItem('hintro_feedback', JSON.stringify(prev));
+  closeFeedback();
+  document.getElementById('fb-message').value = '';
+  document.getElementById('fb-email').value = '';
+  setStar(0);
+  showToast('✓ Feedback saved — thank you!');
+}
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = err ? 'var(--red)' : 'var(--green)';
+  t.style.color = err ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Mobile sidebar
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// Keyboard close modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFeedback(); });
+
+// Kick off
+loadAll();
+</script>
+</body>
+</html>
